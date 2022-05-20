@@ -3,18 +3,22 @@ from tkinter import Button, Label
 import random
 from turtle import width
 import settings
+import ctypes
 # import math
 
 class Cell:
     all = []
     cell_count = settings.CELL_COUNT
+    player_score = 0
     cell_mine_count = []
     cell_count_lable_object = None
+    score_card = None
 
     def __init__(self, x, y, is_mine = False):
         self.x = x
         self.y = y
         self.is_mine = is_mine
+        self.is_mine_candidate = False
         self.is_opened = False
         self.cell_btn_onj = None
 
@@ -44,6 +48,19 @@ class Cell:
         )
         Cell.cell_count_lable_object = lbl
 
+    
+    @staticmethod
+    def create_score_card(location):
+        sc = Label(
+            location,
+            bg='black',
+            fg='white',
+            text=f"Score : {Cell.player_score}",
+            width=12,
+            height=4,
+            font=("", 30)
+        )
+        Cell.score_card = sc
 
     def left_click_actions(self, event):
         if self.is_mine:
@@ -89,10 +106,12 @@ class Cell:
     def show_cell(self):
         if not self.is_opened:
             Cell.cell_count -= 1
-            self.cell_btn_onj.configure(text=self.surrounded_cells_mines_length)
+            Cell.player_score += 1
+            self.cell_btn_onj.configure(bg = 'SystemButtonFace',text=self.surrounded_cells_mines_length)
             # Replace the text of cell count label with the newer count
             if Cell.cell_count_lable_object:
                 Cell.cell_count_lable_object.configure(text=f"Cells Left : {Cell.cell_count}")
+                Cell.score_card.configure(text=f"Score : {Cell.player_score}")
 
         # Mark the cell as opened
         self.is_opened = True
@@ -102,11 +121,21 @@ class Cell:
         # a logic to interrupt the game and 
         # display that the player have lost
         # and an option to restart
+        ctypes.windll.user32.MessageBoxW(0, 'You clicked on a mine', 'Game Over', 1)
         self.cell_btn_onj.configure(bg='red', text='mine')
 
+
     def right_click_actions(self, event):
-        print(event)
-        print('Right is clicked!')
+        if not self.is_mine_candidate:
+            self.cell_btn_onj.configure(
+                bg = 'orange'
+            )
+            self.is_mine_candidate = True
+        else:
+            self.cell_btn_onj.configure(
+                bg = 'SystemButtonFace'
+            )
+            self.is_mine_candidate = False
 
 
     @staticmethod

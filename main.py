@@ -1,3 +1,4 @@
+from cgitb import text
 from tkinter import *
 from cell import Cell
 import settings
@@ -51,10 +52,16 @@ for x in range(settings.GRID_SIZE):
 
 # Call the label from cell class 
 Cell.create_cell_count_table(left_frame)
+Cell.create_score_card(left_frame)
 
 Cell.cell_count_lable_object.place(
     x = 0,
     y = 0
+)
+
+Cell.score_card.place(
+    x = 0,
+    y = 180
 )
 
 Cell.randomize_mines()
